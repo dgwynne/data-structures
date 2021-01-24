@@ -1,0 +1,204 @@
+.\"	$OpenBSD$
+.\"
+.\" Copyright (c) 2016 David Gwynne <dlg@openbsd.org>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: September 5 2016 $
+.Dt HEAP_INIT 9
+.Os
+.Sh NAME
+.Nm HEAP_INIT ,
+.Nm HEAP_INSERT ,
+.Nm HEAP_REMOVE ,
+.Nm HEAP_FIRST ,
+.Nm HEAP_EXTRACT ,
+.Nm HEAP_CEXTRACT
+.Nd Kernel Heap Data Structure
+.Sh SYNOPSIS
+.In sys/tree.h
+.Fn HEAP_HEAD "NAME"
+.Fn HEAP_PROTOTYPE "NAME" "TYPE"
+.Fc
+.Fo HEAP_GENERATE
+.Fa "NAME"
+.Fa "TYPE"
+.Fa "ENTRY"
+.Fa "int (*compare)(const struct TYPE *, const struct TYPE *)"
+.Fc
+.Ft struct NAME
+.Fn HEAP_INITIALIZER
+.Ft void
+.Fn HEAP_INIT "NAME" "struct NAME *heap"
+.Ft struct TYPE *
+.Fn HEAP_INSERT "NAME" "struct NAME *heap" "struct TYPE *elm"
+.Ft struct TYPE *
+.Fn HEAP_REMOVE "NAME" "struct NAME *heap" "struct TYPE *elm"
+.Ft struct TYPE *
+.Fn HEAP_FIRST "NAME" "struct NAME *heap"
+.Ft struct TYPE *
+.Fn HEAP_EXTRACT "NAME" "struct NAME *heap"
+.Ft struct TYPE *
+.Fn HEAP_CEXTRACT "NAME" "struct NAME *heap" "const struct TYPE *key"
+.Sh DESCRIPTION
+The heap API provides data structures and operations for storing elements
+in a heap. The API implements a pairing heap that sorts elements
+according to a user defined comparison function.
+.Pp
+This API is implemented as a set of functions that operate on generic
+pointers, but users of the API generate wrappers and macros that provide
+type safety when calling the functions.
+.Pp
+In the macro definitions,
+.Fa TYPE
+is the name of a structure that will be stored in a heap.
+The
+.Fa TYPE
+structure must contain an
+heap_entry
+structure that allows the element to be connected to a heap.
+The argument
+.Fa NAME
+is the name of a heap type that can store a particular
+.Fa TYPE
+element.
+.Pp
+The
+.Fn HEAP_HEAD
+macro creates a heap type to store
+.Fa TYPE
+structures as elements in the heap.
+The argument
+.Fa NAME
+must uniquely identify every type of heap that is defined.
+.Pp
+.Fn HEAP_PROTOTYPE
+produces the wrappers for a heap type identified by
+.Fa NAME
+to operate on elements of type
+.Fa TYPE .
+.Pp
+.Fn HEAP_GENERATE
+produces the internal data structures used by the heap
+type identified by
+.Fa NAME
+to operate on elements of type
+.Fa TYPE .
+.Fa ENTRY
+specifies which field in the
+.Fa TYPE
+structure is used to connect elements to
+.Fa NAME
+heaps.
+Elements in the heap are ordered according to the result of comparing
+them with the
+.Fa compare
+function.
+If the first argument to
+.Fa compare
+is to be ordered lower than the second,
+the function returns a value smaller than zero.
+If the first argument is to be ordered higher than the second,
+the function returns a value greater than zero.
+If they are equal, the function returns zero.
+.Pp
+.Fn HEAP_INIT
+initialises
+.Fa heap
+of type
+.Fa NAME
+to an empty state.
+.Pp
+.Fn HEAP_INITIALIZER
+can be used to initialise a declaration of a heap
+to an empty state.
+.Pp
+.Fn HEAP_INSERT
+inserts the element
+.Fa elm
+into the
+.Fa heap
+structure of type
+.Fa NAME .
+.Pp
+.Fn HEAP_REMOVE
+removes the element
+.Fa elm
+from the
+.Fa heap
+of type
+.Fa NAME .
+.Fa elm
+must exist in the
+.Fa heap
+before it is removed.
+.Pp
+.Fn HEAP_FIRST
+returns the lowest ordered element in the
+.Fa heap
+of type
+.Fa NAME .
+.Pp
+.Fn HEAP_EXTRACT
+removes the lowest ordered element from the
+.Fa heap
+of type
+.Fa NAME
+and returns it.
+.Pp
+.Fn HEAP_CEXTRACT
+conditionally removes the lowest ordered element from the
+.Fa heap
+of type
+.Fa NAME
+and returns it if it compares lower than the
+.Fa key
+element.
+.Sh CONTEXT
+.Fn HEAP_INIT ,
+.Fn HEAP_INSERT,
+.Fn HEAP_REMOVE ,
+.Fn HEAP_FIRST ,
+.Fn HEAP_EXTRACT ,
+and
+.Fn HEAP_CEXTRACT
+can be called during autoconf, from process context, or from interrupt
+context.
+.Pp
+It is up to the caller to provide appropriate locking around calls to
+these functions to prevent concurrent access to the relevant data structures.
+.Sh RETURN VALUES
+.Fn HEAP_FIRST
+returns a reference to the lowest ordered element in the heap,
+or
+.Dv NULL
+if it is empty.
+.Pp
+.Fn HEAP_EXTRACT
+returns a reference to the lowest ordered element in the heap,
+or
+.Dv NULL
+if it is empty.
+.Pp
+.Fn HEAP_CEXTRACT
+returns a reference to the lowest ordered element in the heap if it compares
+lower than the
+.Fa key
+argument,
+or
+.Dv NULL
+if it is empty or the lowest ordered element is higher than
+.Fa key .
+.Sh SEE ALSO
+.Xr RBT_INIT 3 ,
+.Xr TAILQ_INIT 3
