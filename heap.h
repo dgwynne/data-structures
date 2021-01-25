@@ -90,6 +90,13 @@ _name##_HEAP_FIRST(struct _name *head)					\
 	return _heap_first(_name##_HEAP_TYPE, &head->heap);		\
 }									\
 									\
+static inline void							\
+_name##_HEAP_MERGE(struct _name *head1, struct _name head2)		\
+{									\
+	head1->heap.h_root = _heap_merge(_name##_HEAP_TYPE,		\
+	    &head1->heap, &head2->heap);				\
+}									\
+									\
 static inline struct _type *						\
 _name##_HEAP_EXTRACT(struct _name *head)				\
 {									\
@@ -125,6 +132,7 @@ const struct _heap_type *const _name##_HEAP_TYPE = &_name##_HEAP_INFO
 #define HEAP_INSERT(_name, _h, _e)	_name##_HEAP_INSERT((_h), (_e))
 #define HEAP_REMOVE(_name, _h, _e)	_name##_HEAP_REMOVE((_h), (_e))
 #define HEAP_FIRST(_name, _h)		_name##_HEAP_FIRST((_h))
+#define HEAP_MERGE(_name, _h1, _h2)	_name##_HEAP_MERGE((_h1), (_h2))
 #define HEAP_EXTRACT(_name, _h)		_name##_HEAP_EXTRACT((_h))
 #define HEAP_CEXTRACT(_name, _h, _k)	_name##_HEAP_CEXTRACT((_h), (_k))
 #define HEAP_EMPTY(_name, _h)		_name##_HEAP_EMPTY((_h))

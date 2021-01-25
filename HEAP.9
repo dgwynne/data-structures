@@ -22,6 +22,7 @@
 .Nm HEAP_INSERT ,
 .Nm HEAP_REMOVE ,
 .Nm HEAP_FIRST ,
+.Nm HEAP_MERGE ,
 .Nm HEAP_EXTRACT ,
 .Nm HEAP_CEXTRACT
 .Nd Kernel Heap Data Structure
@@ -45,6 +46,8 @@
 .Fn HEAP_REMOVE "NAME" "struct NAME *heap" "struct TYPE *elm"
 .Ft struct TYPE *
 .Fn HEAP_FIRST "NAME" "struct NAME *heap"
+.Ft void
+.Fn HEAP_MERGE "NAME" "struct NAME *heap1" "struct NAME *heap2"
 .Ft struct TYPE *
 .Fn HEAP_EXTRACT "NAME" "struct NAME *heap"
 .Ft struct TYPE *
@@ -148,6 +151,12 @@ returns the lowest ordered element in the
 .Fa heap
 of type
 .Fa NAME .
+.Pp
+.Fn HEAP_MERGE
+merges the elements from
+.Fa heap2
+into
+.Fa heap1
 .Pp
 .Fn HEAP_EXTRACT
 removes the lowest ordered element from the
