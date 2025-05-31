@@ -19,7 +19,7 @@
 #include "heap.h"
 
 static inline struct _heap_entry *
-heap_n2e(const struct _heap_type *t, void *node)
+heap_n2e(const struct _heap_type *t, const void *node)
 {
 	unsigned long addr = (unsigned long)node;
 
@@ -27,14 +27,14 @@ heap_n2e(const struct _heap_type *t, void *node)
 }
 
 static inline void *
-heap_e2n(const struct _heap_type *t, struct _heap_entry *he)
+heap_e2n(const struct _heap_type *t, const struct _heap_entry *he)
 {
 	unsigned long addr = (unsigned long)he;
 
 	return ((void *)(addr - t->t_offset));
 }
 
-static struct _heap_entry *
+struct _heap_entry *
 _heap_merge(const struct _heap_type *t,
     struct _heap_entry *he1, struct _heap_entry *he2)
 {
@@ -46,12 +46,12 @@ _heap_merge(const struct _heap_type *t,
 	if (he2 == NULL)
 		return (he1);
 
-	if (t->t_compare(heap_e2n(t, he1), heap_e2n(t, he2)) >= 0) {
-		hi = he1;
-		lo = he2;
-	} else {
+	if (t->t_compare(heap_e2n(t, he1), heap_e2n(t, he2)) < 0) {
 		lo = he1;
 		hi = he2;
+	} else {
+		hi = he1;
+		lo = he2;
 	}
 
 	child = lo->he_child;
@@ -188,10 +188,46 @@ _heap_cextract(const struct _heap_type *t, struct _heap *h, const void *key)
 		return (NULL);
 
 	node = heap_e2n(t, first);
-	if (t->t_compare(node, key) > 0)
+	if (t->t_compare(key, node) < 0)
 		return (NULL);
 
 	h->h_root = _heap_2pass_merge(t, first);
 
 	return (node);
+}
+
+void *
+_heap_iter_next(const struct _heap_type *t, const void *node)
+{
+	const struct _heap_entry *he = heap_n2e(t, node);
+	const struct _heap_entry *phe;
+
+	/* go down the tree first */
+	if (he->he_child != NULL)
+		return (heap_e2n(t, he->he_child));
+
+	/* go right when we hit the bottom */
+	if (he->he_nextsibling != NULL)
+		return (heap_e2n(t, he->he_nextsibling));
+
+	/* ok, we need to go back to the left and up */
+	for (;;) {
+		phe = he->he_left;
+		if (phe == NULL) {
+			/* we're back at the root */
+			break;
+		}
+
+		/* is the prev node the parent? */
+		if (phe->he_child == he) {
+			/* try go to the right of the parent */
+			if (phe->he_nextsibling != NULL)
+				return (heap_e2n(t, phe->he_nextsibling));
+		}
+
+		/* oh well, go back again */
+		he = phe;
+	}
+
+	return (NULL);
 }

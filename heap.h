@@ -19,7 +19,7 @@
 #ifndef _HEAP_H_
 #define _HEAP_H_
 
-#include <stddef.h>
+#include <sys/_null.h>
 
 struct _heap_type {
 	int			(*t_compare)(const void *, const void *);
@@ -57,62 +57,78 @@ _heap_empty(struct _heap *h)
 void	 _heap_insert(const struct _heap_type *, struct _heap *, void *);
 void	 _heap_remove(const struct _heap_type *, struct _heap *, void *);
 void	*_heap_first(const struct _heap_type *, struct _heap *);
+struct _heap_entry *
+	_heap_merge(const struct _heap_type *,
+	    struct _heap_entry *, struct _heap_entry *);
 void	*_heap_extract(const struct _heap_type *, struct _heap *);
 void	*_heap_cextract(const struct _heap_type *, struct _heap *,
 	     const void *);
+void	*_heap_iter_next(const struct _heap_type *, const void *);
 
 #define HEAP_INITIALIZER(_head)	{ { NULL } }
 
 #define HEAP_PROTOTYPE(_name, _type)					\
 extern const struct _heap_type *const _name##_HEAP_TYPE;		\
 									\
-static inline void							\
+static __unused inline void						\
 _name##_HEAP_INIT(struct _name *head)					\
 {									\
 	_heap_init(&head->heap);					\
 }									\
 									\
-static inline void							\
+static __unused inline void						\
 _name##_HEAP_INSERT(struct _name *head, struct _type *elm)		\
 {									\
 	_heap_insert(_name##_HEAP_TYPE, &head->heap, elm);		\
 }									\
 									\
-static inline void							\
+static __unused inline void						\
 _name##_HEAP_REMOVE(struct _name *head, struct _type *elm)		\
 {									\
 	_heap_remove(_name##_HEAP_TYPE, &head->heap, elm);		\
 }									\
 									\
-static inline struct _type *						\
+static __unused inline struct _type *					\
 _name##_HEAP_FIRST(struct _name *head)					\
 {									\
 	return _heap_first(_name##_HEAP_TYPE, &head->heap);		\
 }									\
 									\
-static inline void							\
-_name##_HEAP_MERGE(struct _name *head1, struct _name head2)		\
+static __unused inline void						\
+_name##_HEAP_MERGE(struct _name *head1, struct _name *head2)		\
 {									\
 	head1->heap.h_root = _heap_merge(_name##_HEAP_TYPE,		\
-	    &head1->heap, &head2->heap);				\
+	    head1->heap.h_root, head2->heap.h_root);			\
 }									\
 									\
-static inline struct _type *						\
+static __unused inline struct _type *					\
 _name##_HEAP_EXTRACT(struct _name *head)				\
 {									\
 	return _heap_extract(_name##_HEAP_TYPE, &head->heap);		\
 }									\
 									\
-static inline struct _type *						\
+static __unused inline struct _type *					\
 _name##_HEAP_CEXTRACT(struct _name *head, const struct _type *key)	\
 {									\
 	return _heap_cextract(_name##_HEAP_TYPE, &head->heap, key);	\
 }									\
 									\
-static inline int							\
+static __unused inline int						\
 _name##_HEAP_EMPTY(struct _name *head)					\
 {									\
 	return _heap_empty(&head->heap);				\
+}									\
+									\
+static __unused inline struct _type *					\
+_name##_HEAP_ITER_FIRST(struct _name *head)				\
+{									\
+	return _heap_first(_name##_HEAP_TYPE, &head->heap);		\
+}									\
+									\
+static __unused inline struct _type *					\
+_name##_HEAP_ITER_NEXT(struct _type *elm)				\
+{									\
+	return _heap_iter_next(_name##_HEAP_TYPE, elm);			\
 }
 
 #define HEAP_GENERATE(_name, _type, _field, _cmp)			\
@@ -136,5 +152,8 @@ const struct _heap_type *const _name##_HEAP_TYPE = &_name##_HEAP_INFO
 #define HEAP_EXTRACT(_name, _h)		_name##_HEAP_EXTRACT((_h))
 #define HEAP_CEXTRACT(_name, _h, _k)	_name##_HEAP_CEXTRACT((_h), (_k))
 #define HEAP_EMPTY(_name, _h)		_name##_HEAP_EMPTY((_h))
+
+#define HEAP_ITER_FIRST(_name, _h)	_name##_HEAP_ITER_FIRST((_h))
+#define HEAP_ITER_NEXT(_name, _e)	_name##_HEAP_ITER_NEXT((_e))
 
 #endif /* _HEAP_H_ */
