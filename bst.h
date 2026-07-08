@@ -89,7 +89,7 @@ struct _name {								\
 void	*_rbt_insert(const struct rbt_type *, struct bstree *, void *);
 void	*_rbt_remove(const struct rbt_type *, struct bstree *, void *);
 
-#define RBT_PROTOTYPE(_name, _type, _field, _cmp)			\
+#define RBT_PROTOTYPE(_name, _type, _field)				\
 extern const struct rbt_type _name##_RBT_TYPE;				\
 									\
 __unused static inline void						\
@@ -291,7 +291,7 @@ struct _name {								\
 void	*_avl_insert(const struct bst_type *, struct bstree *, void *);
 void	*_avl_remove(const struct bst_type *, struct bstree *, void *);
 
-#define AVL_PROTOTYPE(_name, _type, _field, _cmp)			\
+#define AVL_PROTOTYPE(_name, _type, _field)				\
 extern const struct bst_type _name##_AVL_TYPE;				\
 									\
 __unused static inline void						\
