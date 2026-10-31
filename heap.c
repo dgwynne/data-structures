@@ -210,15 +210,12 @@ _heap_iter_next(const struct _heap_type *t, const void *node)
 	if (he->he_nextsibling != NULL)
 		return (heap_e2n(t, he->he_nextsibling));
 
-	/* ok, we need to go back to the left and up */
-	for (;;) {
-		phe = he->he_left;
-		if (phe == NULL) {
-			/* we're back at the root */
-			break;
-		}
-
-		/* is the prev node the parent? */
+	/*
+	 * ok, we need to go back to the left and up. if the previous
+	 * entry is NULL then we were at the root of the heap.
+	 */
+	while ((phe = he->he_left) != NULL) {
+		/* we're at the far left if the prev node is the parent */
 		if (phe->he_child == he) {
 			/* try go to the right of the parent */
 			if (phe->he_nextsibling != NULL)
