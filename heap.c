@@ -128,6 +128,19 @@ _heap_2pass_merge(const struct _heap_type *t, struct _heap_entry *root)
 	return (list);
 }
 
+static inline void
+_heap_merge_root(const struct _heap_type *t, struct _heap *h,
+    struct _heap_entry *he)
+{
+	struct _heap_entry *hr;
+	struct _heap_entry *nhr;
+
+	hr = h->h_root;
+	nhr = _heap_merge(t, hr, he);
+	if (nhr != hr)
+		h->h_root = nhr;
+}
+
 void
 _heap_insert(const struct _heap_type *t, struct _heap *h, void *node)
 {
@@ -137,7 +150,7 @@ _heap_insert(const struct _heap_type *t, struct _heap *h, void *node)
 	he->he_child = NULL;
 	he->he_nextsibling = NULL;
 
-	h->h_root = _heap_merge(t, h->h_root, he);
+	_heap_merge_root(t, h, he);
 }
 
 void
@@ -151,7 +164,7 @@ _heap_remove(const struct _heap_type *t, struct _heap *h, void *node)
 	}
 
 	_heap_sibling_remove(he);
-	h->h_root = _heap_merge(t, h->h_root, _heap_2pass_merge(t, he));
+	_heap_merge_root(t, h, _heap_2pass_merge(t, he));
 }
 
 void *

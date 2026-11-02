@@ -10,3 +10,7 @@ traditional `sys/tree.h` APIs.
 ## heap.h
 
 This implements a pairing heap.
+
+## aheap.h
+
+This implements "heapify" operations for array based heaps.
