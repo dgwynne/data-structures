@@ -70,18 +70,22 @@ _heap_merge(const struct _heap_type *t,
 static inline void
 _heap_sibling_remove(struct _heap_entry *he)
 {
-	if (he->he_left == NULL)
-		return;
+	struct _heap_entry *left;
+	struct _heap_entry *nextsibling;
 
-	if (he->he_left->he_child == he) {
-		if ((he->he_left->he_child = he->he_nextsibling) != NULL)
-			he->he_nextsibling->he_left = he->he_left;
-	} else {
-		if ((he->he_left->he_nextsibling = he->he_nextsibling) != NULL)
-			he->he_nextsibling->he_left = he->he_left;
+	left = he->he_left;
+	if (left != NULL) {
+		nextsibling = he->he_nextsibling;
+		if (left->he_child == he)
+			left->he_child = nextsibling;
+		else
+			left->he_nextsibling = nextsibling;
+
+		if (nextsibling != NULL)
+			nextsibling->he_left = left;
+
+		he->he_left = NULL;
 	}
-
-	he->he_left = NULL;
 	he->he_nextsibling = NULL;
 }
 
@@ -128,7 +132,7 @@ _heap_2pass_merge(const struct _heap_type *t, struct _heap_entry *root)
 	return (list);
 }
 
-static inline void
+static inline int
 _heap_merge_root(const struct _heap_type *t, struct _heap *h,
     struct _heap_entry *he)
 {
@@ -137,11 +141,27 @@ _heap_merge_root(const struct _heap_type *t, struct _heap *h,
 
 	hr = h->h_root;
 	nhr = _heap_merge(t, hr, he);
-	if (nhr != hr)
+	if (nhr != hr) {
 		h->h_root = nhr;
+		return (1);
+	}
+	return (0);
 }
 
-void
+int
+_heap_merge_heap(const struct _heap_type *t, struct _heap *h, struct _heap *oh)
+{
+	struct _heap_entry *ohr;
+
+	ohr = oh->h_root;
+	if (ohr == NULL)
+		return (0);
+
+	oh->h_root = NULL;
+	return (_heap_merge_root(t, h, ohr));
+}
+
+int
 _heap_insert(const struct _heap_type *t, struct _heap *h, void *node)
 {
 	struct _heap_entry *he = heap_n2e(t, node);
@@ -150,21 +170,28 @@ _heap_insert(const struct _heap_type *t, struct _heap *h, void *node)
 	he->he_child = NULL;
 	he->he_nextsibling = NULL;
 
-	_heap_merge_root(t, h, he);
+	return (_heap_merge_root(t, h, he));
 }
 
-void
+int
 _heap_remove(const struct _heap_type *t, struct _heap *h, void *node)
 {
 	struct _heap_entry *he = heap_n2e(t, node);
+	struct _heap_entry *lhe;
 
-	if (he->he_left == NULL) {
-		_heap_extract(t, h);
-		return;
+	lhe = _heap_2pass_merge(t, he);
+
+	if (h->h_root == he) {
+		h->h_root = lhe;
+		return (1);
 	}
 
 	_heap_sibling_remove(he);
-	_heap_merge_root(t, h, _heap_2pass_merge(t, he));
+
+	if (lhe == NULL)
+		return (0);
+
+	return (_heap_merge_root(t, h, lhe));
 }
 
 void *
