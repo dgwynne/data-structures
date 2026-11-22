@@ -67,7 +67,7 @@ _heap_merge(const struct _heap_type *t,
 	return (lo);
 }
 
-static inline void
+static void
 _heap_sibling_remove(struct _heap_entry *he)
 {
 	struct _heap_entry *left;
