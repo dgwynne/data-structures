@@ -97,9 +97,7 @@ _heap_2pass_merge(const struct _heap_type *t, struct _heap_entry *root)
 
 	node = root->he_child;
 	if (node == NULL)
-		return (NULL);
-
-	root->he_child = NULL;
+		goto done;
 
 	/* first pass */
 	for (next = node->he_nextsibling; next != NULL;
@@ -128,6 +126,11 @@ _heap_2pass_merge(const struct _heap_type *t, struct _heap_entry *root)
 
 	list->he_left = NULL;
 	list->he_nextsibling = NULL;
+
+done:
+	root->he_left = NULL;
+	root->he_child = NULL;
+	root->he_nextsibling = NULL;
 
 	return (list);
 }
