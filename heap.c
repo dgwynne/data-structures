@@ -195,7 +195,7 @@ _heap_remove(const struct _heap_type *t, struct _heap *h, void *node)
 }
 
 void *
-_heap_first(const struct _heap_type *t, struct _heap *h)
+_heap_first(const struct _heap_type *t, const struct _heap *h)
 {
 	struct _heap_entry *first = h->h_root;
 

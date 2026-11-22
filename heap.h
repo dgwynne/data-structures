@@ -56,7 +56,7 @@ _heap_empty(struct _heap *h)
 
 int	 _heap_insert(const struct _heap_type *, struct _heap *, void *);
 int	 _heap_remove(const struct _heap_type *, struct _heap *, void *);
-void	*_heap_first(const struct _heap_type *, struct _heap *);
+void	*_heap_first(const struct _heap_type *, const struct _heap *);
 int	 _heap_merge_heap(const struct _heap_type *,
 	     struct _heap *, struct _heap *);
 void	*_heap_extract(const struct _heap_type *, struct _heap *);
@@ -88,7 +88,7 @@ _name##_HEAP_REMOVE(struct _name *head, struct _type *elm)		\
 }									\
 									\
 static __unused inline struct _type *					\
-_name##_HEAP_FIRST(struct _name *head)					\
+_name##_HEAP_FIRST(const struct _name *head)				\
 {									\
 	return _heap_first(_name##_HEAP_TYPE, &head->heap);		\
 }									\
@@ -119,7 +119,7 @@ _name##_HEAP_EMPTY(struct _name *head)					\
 }									\
 									\
 static __unused inline struct _type *					\
-_name##_HEAP_ITER_FIRST(struct _name *head)				\
+_name##_HEAP_ITER_FIRST(const struct _name *head)			\
 {									\
 	return _heap_first(_name##_HEAP_TYPE, &head->heap);		\
 }									\
