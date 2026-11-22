@@ -34,7 +34,7 @@ heap_e2n(const struct _heap_type *t, const struct _heap_entry *he)
 	return ((void *)(addr - t->t_offset));
 }
 
-struct _heap_entry *
+static struct _heap_entry *
 _heap_merge(const struct _heap_type *t,
     struct _heap_entry *he1, struct _heap_entry *he2)
 {
