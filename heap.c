@@ -198,15 +198,13 @@ _heap_remove(const struct _heap_type *t, struct _heap *h, void *node)
 	struct _heap_entry *he = heap_n2e(t, node);
 	struct _heap_entry *lhe;
 
-	lhe = _heap_2pass_merge(t, he);
-
 	if (h->h_root == he) {
-		h->h_root = lhe;
+		h->h_root = _heap_2pass_merge(t, he);
 		return (1);
 	}
 
 	_heap_sibling_remove(he);
-
+	lhe = _heap_2pass_merge(t, he);
 	if (lhe == NULL)
 		return (0);
 
