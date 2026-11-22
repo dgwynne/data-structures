@@ -21,6 +21,7 @@
 .Nm HEAP_INIT ,
 .Nm HEAP_INSERT ,
 .Nm HEAP_REMOVE ,
+.Nm HEAP_DECREASE ,
 .Nm HEAP_MERGE ,
 .Nm HEAP_FIRST ,
 .Nm HEAP_EXTRACT ,
@@ -44,6 +45,8 @@
 .Fn HEAP_INSERT "NAME" "struct NAME *heap" "struct TYPE *elm"
 .Ft int
 .Fn HEAP_REMOVE "NAME" "struct NAME *heap" "struct TYPE *elm"
+.Ft int
+.Fn HEAP_DECREASE "NAME" "struct NAME *heap" "struct TYPE *elm"
 .Ft int
 .Fn HEAP_MERGE "NAME" "struct NAME *heap1" "struct NAME *heap2"
 .Ft struct TYPE *
@@ -146,6 +149,25 @@ must exist in the
 .Fa heap
 before it is removed.
 .Pp
+.Fn HEAP_DECREASE
+moves the element
+.Fa elm
+in the
+.Fa heap
+of type
+.Fa NAME
+after the ordering value has been lowered.
+.Fa elm
+must exist in the
+.Fa heap
+before it is moved.
+An element with a raised ordering must be removed and inserted
+back into the heap with
+.Fa HEAP_REMOVE
+and
+.Fa HEAP_INSERT
+respectively.
+.Pp
 .Fn HEAP_FIRST
 returns the lowest ordered element in the
 .Fa heap
@@ -181,6 +203,7 @@ element.
 .Fn HEAP_INIT ,
 .Fn HEAP_INSERT ,
 .Fn HEAP_REMOVE ,
+.Fn HEAP_DECREASE ,
 .Fn HEAP_FIRST ,
 .Fn HEAP_EXTRACT ,
 and
@@ -192,8 +215,9 @@ It is up to the caller to provide appropriate locking around calls to
 these functions to prevent concurrent access to the relevant data structures.
 .Sh RETURN VALUES
 .Fn HEAP_INSERT ,
+.Fn HEAP_REMOVE ,
 and
-.Fn HEAP_REMOVE
+.Fn HEAP_DECREASE
 return 1 if the lowest ordered element in the heap has changed as
 a result of the operation, or 0.
 .Pp

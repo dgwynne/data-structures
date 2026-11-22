@@ -174,6 +174,22 @@ _heap_insert(const struct _heap_type *t, struct _heap *h, void *node)
 }
 
 int
+_heap_decrease(const struct _heap_type *t, struct _heap *h, void *node)
+{
+	struct _heap_entry *he = heap_n2e(t, node);
+
+	/* already the root */
+	if (h->h_root == he)
+		return (0);
+
+	/* detach from its current sibling list */
+	_heap_sibling_remove(he);
+
+	/* meld with the current root */
+	return (_heap_merge_root(t, h, he));
+}
+
+int
 _heap_remove(const struct _heap_type *t, struct _heap *h, void *node)
 {
 	struct _heap_entry *he = heap_n2e(t, node);

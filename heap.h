@@ -55,6 +55,7 @@ _heap_empty(struct _heap *h)
 }
 
 int	 _heap_insert(const struct _heap_type *, struct _heap *, void *);
+int	 _heap_decrease(const struct _heap_type *, struct _heap *, void *);
 int	 _heap_remove(const struct _heap_type *, struct _heap *, void *);
 void	*_heap_first(const struct _heap_type *, const struct _heap *);
 int	 _heap_merge_heap(const struct _heap_type *,
@@ -79,6 +80,12 @@ static __unused inline int						\
 _name##_HEAP_INSERT(struct _name *head, struct _type *elm)		\
 {									\
 	return (_heap_insert(_name##_HEAP_TYPE, &head->heap, elm));	\
+}									\
+									\
+static __unused inline int						\
+_name##_HEAP_DECREASE(struct _name *head, struct _type *elm)		\
+{									\
+	return _heap_decrease(_name##_HEAP_TYPE, &head->heap, elm);	\
 }									\
 									\
 static __unused inline int						\
@@ -145,6 +152,7 @@ const struct _heap_type *const _name##_HEAP_TYPE = &_name##_HEAP_INFO
 
 #define HEAP_INIT(_name, _h)		_name##_HEAP_INIT((_h))
 #define HEAP_INSERT(_name, _h, _e)	_name##_HEAP_INSERT((_h), (_e))
+#define HEAP_DECREASE(_name, _h, _e)	_name##_HEAP_DECREASE((_h), (_e))
 #define HEAP_REMOVE(_name, _h, _e)	_name##_HEAP_REMOVE((_h), (_e))
 #define HEAP_FIRST(_name, _h)		_name##_HEAP_FIRST((_h))
 #define HEAP_MERGE(_name, _h1, _h2)	_name##_HEAP_MERGE((_h1), (_h2))
